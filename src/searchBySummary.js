@@ -8,14 +8,21 @@ module.exports = (baseFileDir, source, params, callback) => {
 
   const searchUrl = source.url + '/rest/api/2/search/';
   let jql = null;
+  let custom_filter = "";
+
+  if (params.custom_filter) {
+    custom_filter = replaceTextFileString(baseFileDir, params.custom_filter).trim();
+    custom_filter = " " + custom_filter + " ";
+  }
+
   if (params.issue_key) {
     debug('Searching for issue by key: %s', params.issue_key);
     const issue_key = replaceTextFileString(baseFileDir, params.issue_key);
-    jql = 'project="' + source.project + '" AND key="' + issue_key + '" ORDER BY id DESC';
+    jql = 'project="' + source.project + '" AND key="' + issue_key + '"' + custom_filter + ' ORDER BY id DESC';
   } else {
     debug('Searching for issue by summary: %s', params.summary);
     const summary = replaceTextFileString(baseFileDir, params.summary);
-    jql = 'project="' + source.project + '" AND summary~"' + summary + '" ORDER BY id DESC';
+    jql = 'project="' + source.project + '" AND summary~"' + summary + '"' + custom_filter + ' ORDER BY id DESC';
   }
 
   let search = {
